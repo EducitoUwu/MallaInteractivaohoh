@@ -97,13 +97,34 @@ function App() {
   
   ]);
 
-  const [studentProgress, setStudentProgress] = useState<StudentProgress>({
-    completedSubjects: [],
-    currentSemester: 1,
-    totalCredits: 0
-  });
+  // Función para cargar datos desde localStorage
+  const loadProgressFromStorage = (): StudentProgress => {
+    try {
+      const savedProgress = localStorage.getItem('foxita-student-progress');
+      if (savedProgress) {
+        return JSON.parse(savedProgress);
+      }
+    } catch (error) {
+      console.error('Error loading progress from localStorage:', error);
+    }
+    return {
+      completedSubjects: [],
+      currentSemester: 1,
+      totalCredits: 0
+    };
+  };
 
+  const [studentProgress, setStudentProgress] = useState<StudentProgress>(loadProgressFromStorage);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+
+  // Guardar progreso en localStorage cuando cambie
+  useEffect(() => {
+    try {
+      localStorage.setItem('foxita-student-progress', JSON.stringify(studentProgress));
+    } catch (error) {
+      console.error('Error saving progress to localStorage:', error);
+    }
+  }, [studentProgress]);
 
   // Actualizar disponibilidad de materias según prerequisitos
   useEffect(() => {
@@ -128,6 +149,17 @@ function App() {
         };
       })
     );
+  };
+
+  // Función para resetear el progreso (opcional)
+  const resetProgress = () => {
+    const defaultProgress = {
+      completedSubjects: [],
+      currentSemester: 1,
+      totalCredits: 0
+    };
+    setStudentProgress(defaultProgress);
+    localStorage.removeItem('foxita-student-progress');
   };
 
   const toggleSubjectCompletion = (subjectCode: string) => {
@@ -233,6 +265,23 @@ function App() {
               transition={{ duration: 1, delay: 0.5 }}
             />
           </div>
+          
+          <button 
+            className="reset-btn"
+            onClick={resetProgress}
+            style={{
+              marginTop: '10px',
+              padding: '8px 16px',
+              backgroundColor: '#ff4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            🔄 Resetear Progreso
+          </button>
         </div>
       </div>
 
