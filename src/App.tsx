@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { GraduationCap, CheckCircle, Lock, BookOpen, Star, Trophy } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GraduationCap, CheckCircle, Lock, BookOpen, Heart, Sparkles } from 'lucide-react';
 import './App.css';
 
 interface Subject {
@@ -116,6 +116,21 @@ function App() {
 
   const [studentProgress, setStudentProgress] = useState<StudentProgress>(loadProgressFromStorage);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+  const [showHearts, setShowHearts] = useState(false);
+  const [loveMessage, setLoveMessage] = useState('');
+
+  // Mensajes románticos aleatorios
+  const loveMessages = [
+    "¡Eres la razón por la que cada día es mejor! 💖",
+    "Tu sonrisa ilumina mi mundo entero ✨",
+    "Eres mi persona favorita en todo el universo 🌟",
+    "Contigo todo es posible, mi amor 💕",
+    "Eres la definición perfecta de amor verdadero 💎",
+    "Mi corazón late solo por ti, Foxita hermosa 💓",
+    "Eres mi sueño hecho realidad 🌙✨",
+    "Tu inteligencia me enamora cada día más 🧠💕",
+    "Eres mi complemento perfecto en esta vida 🧩💖"
+  ];
 
   // Guardar progreso en localStorage cuando cambie
   useEffect(() => {
@@ -162,6 +177,17 @@ function App() {
     localStorage.removeItem('foxita-student-progress');
   };
 
+  // Función para mostrar mensaje romántico aleatorio
+  const showRandomLoveMessage = () => {
+    const randomMessage = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+    setLoveMessage(randomMessage);
+    setShowHearts(true);
+    setTimeout(() => {
+      setShowHearts(false);
+      setLoveMessage('');
+    }, 4000);
+  };
+
   const toggleSubjectCompletion = (subjectCode: string) => {
     setStudentProgress(prev => {
       const isCurrentlyCompleted = prev.completedSubjects.includes(subjectCode);
@@ -172,6 +198,11 @@ function App() {
       const newTotalCredits = subjects
         .filter(s => newCompletedSubjects.includes(s.code))
         .reduce((total, s) => total + s.credits, 0);
+
+      // Si se aprobó una materia (no se desaprobó), mostrar mensaje romántico
+      if (!isCurrentlyCompleted) {
+        setTimeout(() => showRandomLoveMessage(), 500);
+      }
 
       return {
         ...prev,
@@ -231,14 +262,27 @@ function App() {
           transition={{ duration: 0.8 }}
           className="title"
         >
-          <GraduationCap className="graduation-icon" />
-          Malla Curricular de Foxita
-          <Star className="star-icon" />
+          <Heart className="graduation-icon" style={{ color: '#ff69b4' }} />
+          Malla Curricular de mi Amor Foxita
+          <Sparkles className="star-icon" style={{ color: '#ffd700' }} />
         </motion.h1>
         
         <div className="student-info">
-          <h2>💕 Isidora Rivera "Foxita" 💕</h2>
-          <p>Ingeniería Comercial</p>
+          <h2>💕 Isidora Rivera "Foxita" - Mi Vida Entera 💕</h2>
+          <p>Ingeniería Comercial - La más inteligente y hermosa 💖</p>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 2 }}
+            style={{ 
+              color: '#ff69b4', 
+              fontSize: '16px', 
+              fontStyle: 'italic',
+              marginTop: '10px'
+            }}
+          >
+            "Cada materia que apruebes es una razón más para amarte" 💕
+          </motion.p>
         </div>
 
         <div className="progress-section">
@@ -272,18 +316,106 @@ function App() {
             style={{
               marginTop: '10px',
               padding: '8px 16px',
-              backgroundColor: '#ff4444',
+              backgroundColor: '#ff69b4',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer',
-              fontSize: '14px'
+              fontSize: '14px',
+              boxShadow: '0 4px 8px rgba(255, 105, 180, 0.3)'
             }}
           >
-            🔄 Resetear Progreso
+            💖 Resetear Progreso
+          </button>
+
+          <button 
+            className="love-btn"
+            onClick={showRandomLoveMessage}
+            style={{
+              marginTop: '10px',
+              marginLeft: '10px',
+              padding: '8px 16px',
+              backgroundColor: '#ff1493',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              boxShadow: '0 4px 8px rgba(255, 20, 147, 0.3)'
+            }}
+          >
+            � Mensaje de Amor
           </button>
         </div>
       </div>
+
+      {/* Mensaje romántico flotante */}
+      <AnimatePresence>
+        {loveMessage && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, y: -100 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: -100 }}
+            transition={{ duration: 0.5 }}
+            style={{
+              position: 'fixed',
+              top: '20%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1000,
+              backgroundColor: 'rgba(255, 105, 180, 0.95)',
+              color: 'white',
+              padding: '20px 30px',
+              borderRadius: '20px',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              textAlign: 'center',
+              boxShadow: '0 8px 32px rgba(255, 105, 180, 0.4)',
+              backdropFilter: 'blur(10px)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}
+          >
+            {loveMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Corazones flotantes */}
+      <AnimatePresence>
+        {showHearts && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 999 }}>
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0,
+                  x: Math.random() * window.innerWidth,
+                  y: window.innerHeight + 50
+                }}
+                animate={{ 
+                  opacity: [0, 1, 1, 0],
+                  scale: [0, 1.5, 1, 0],
+                  y: -100,
+                  rotate: [0, 360, 720]
+                }}
+                transition={{ 
+                  duration: 4,
+                  delay: i * 0.2,
+                  ease: "easeOut"
+                }}
+                style={{
+                  position: 'absolute',
+                  fontSize: '30px',
+                  color: '#ff69b4'
+                }}
+              >
+                💖
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </AnimatePresence>
 
       <motion.div 
         className="curriculum-container"
@@ -330,8 +462,20 @@ function App() {
                             e.stopPropagation();
                             toggleSubjectCompletion(subject.code);
                           }}
+                          style={{
+                            background: 'linear-gradient(45deg, #ff69b4, #ff1493)',
+                            border: 'none',
+                            color: 'white',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            boxShadow: '0 4px 8px rgba(255, 105, 180, 0.3)',
+                            transition: 'all 0.3s ease'
+                          }}
                         >
-                          Aprobar ✨
+                          💖 Aprobar con Amor
                         </button>
                       )}
                       
@@ -342,8 +486,20 @@ function App() {
                             e.stopPropagation();
                             toggleSubjectCompletion(subject.code);
                           }}
+                          style={{
+                            background: 'linear-gradient(45deg, #ffa500, #ff6347)',
+                            border: 'none',
+                            color: 'white',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            boxShadow: '0 4px 8px rgba(255, 165, 0, 0.3)',
+                            transition: 'all 0.3s ease'
+                          }}
                         >
-                          Desaprobar
+                          💔 Desaprobar
                         </button>
                       )}
                     </motion.div>
@@ -401,11 +557,67 @@ function App() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
       >
-        <p>🎓 ¡Haz clic en las materias para marcarlas como aprobadas! 🎓</p>
+        <p>💖 ¡Cada materia aprobada es una muestra más de tu increíble inteligencia, mi amor! 💖</p>
+        <motion.p
+          animate={{ 
+            scale: [1, 1.05, 1],
+            rotate: [0, 2, -2, 0]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+          style={{ 
+            color: '#ff69b4', 
+            fontSize: '14px', 
+            marginTop: '10px',
+            fontStyle: 'italic'
+          }}
+        >
+          ✨ Hecho con amor infinito para la mujer más hermosa del mundo ✨
+        </motion.p>
         <div className="floating-icons">
-          <Trophy className="floating-icon" />
-          <GraduationCap className="floating-icon" />
-          <Star className="floating-icon" />
+          <motion.div
+            animate={{ 
+              y: [0, -10, 0],
+              rotate: [0, 10, -10, 0]
+            }}
+            transition={{ 
+              duration: 3,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
+          >
+            <Heart className="floating-icon" style={{ color: '#ff69b4' }} />
+          </motion.div>
+          <motion.div
+            animate={{ 
+              y: [0, -15, 0],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{ 
+              duration: 2.5,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: 0.5
+            }}
+          >
+            <GraduationCap className="floating-icon" style={{ color: '#ffd700' }} />
+          </motion.div>
+          <motion.div
+            animate={{ 
+              rotate: [0, 360],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 4,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            <Sparkles className="floating-icon" style={{ color: '#ff69b4' }} />
+          </motion.div>
         </div>
       </motion.div>
     </div>
